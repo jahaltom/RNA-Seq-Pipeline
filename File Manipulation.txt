@@ -1,0 +1,29 @@
+###Create a directory for all fastq files that is named the same name as fastq file.
+
+for file in /work/LAS/mmcgrail-lab/jahaltom/RNA-Seq-Tumor/RNA_Seq.P*
+do
+       
+    name="$(basename "$file.dir" )"
+
+    
+    mkdir -p /work/LAS/mmcgrail-lab/jahaltom/RNA-Seq-Tumor/"$name"
+
+    
+    mv "$file" "/work/LAS/mmcgrail-lab/jahaltom/RNA-Seq-Tumor/$name"
+done
+
+###Move file "Genes" into all previously made directories. File Genes is a list of Gene IDs one wants to get FPKM values for.  Also move corrsponding PBS script and fastq file into this directory. 
+echo *RNA_Seq.* | xargs -n 1 cp Genes
+
+
+##Submit PBS scripts for all fastq files at once
+find . -name "*RNA_Seq.*" -exec  qsub  {} \;
+
+
+#3 Move output files into one directory. In this case its the FPKM for all genes.
+find -name '*Master*' -exec mv {} /work/LAS/mmcgrail-lab/jahaltom/RNA-Seq-Tumor \;
+
+
+##Combine output files. In this case its the FPKM for all genes.
+paste    1_HOM_CGATGT_L001_R1_001.MasterList 1_HOM_CGATGT_L002_R1_001.MasterList 3_HOM_GCCAAT_L001_R1_001.MasterList 3_HOM_GCCAAT_L002_R1_001.MasterList  4_HOM_CTTGTA_L001_R1_001.MasterList  4_HOM_CTTGTA_L002_R1_001.MasterList 1_WT_ACAGTG_L001_R1_001.MasterList 1_WT_ACAGTG_L002_R1_001.MasterList  3_WT_CAGATC_L001_R1_001.MasterList   3_WT_CAGATC_L002_R1_001.MasterList  4_WT_GTGAAA_L001_R1_001.MasterList  4_WT_GTGAAA_L002_R1_001.MasterList |  awk '{print $1,$2,$3,$6,$9,$12,$15,$18,$21,$24,$27,$30,$33,$36}'| more
+

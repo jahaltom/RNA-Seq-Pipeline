@@ -1,0 +1,4 @@
+To quantify gene expression, Reads Per Kilobase of transcript, per Million mapped reads (RPKM) 
+was calculated using the following equation RPKM= (10^9 x Number of mapped reads to a gene)/ (Gene exonic length x Total mapped reads in the experiment). 
+The count table was used to gather read number and the gene exonic length was calculated from the Danio_rerio.GRCz10.89.gtf file in R using the “GenomicFeatures” package from Bioconductor.
+

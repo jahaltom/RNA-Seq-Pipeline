@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#PBS  -o BATCH_OUTPUT.GSNAP
+#PBS  -e BATCH_ERRORS.GSNAP
+
+
+#PBS -lnodes=1:ppn=16:compute,walltime=12:00:00
+
+
+#Go to working directory 
+cd /work/LAS/jahaltom/RNA-SEQ/GSNAP_RNA_Seq/RNA_Seq.identifier/
+
+
+## GSNAP Alignment.This allows for splicing during the alignment, a maximum of 5 mismatches, and the creation of separate SAM output files for each output type.
+
+gsnap -d ZebraFish --dir=/DataBase/ZebraFish -t 8 -B 4 -m 5 -A sam --split-output=identifier infile
+
+## Sorting for cufflinks.
+
+sort -k 3,3 -k 4,4n identifier.unpaired_uniq | grep -v "KN" > identifier.uniq.sorted
+
+
+
+##Cufflinks FPKM calculation.
+
+module purge
+module use /shared/software/LAS/cufflinks
+module load  LAS/cufflinks/2.2.1
+
+cufflinks -p 8 -N -G Danio_rerio.GRCz10.82.gtf -b ZebraFishV10.fasta -u --compatible-hits-norm identifier.uniq.sorted
+
+
+
+touch txt
+
+###Gather FPKM information for all genes.
+
+more genes.fpkm_tracking |  awk '{if(NF== 13)print $5,$4,$10; else print $5,$4,$13}' | grep -v "FPKM" | grep -v "gene"  | sort | grep -v "rRNA" > identifier.FPKM_List
+
+###If one has a specific list of gene IDs place them in "Genes". Output will be limited to specific gene list. 
+more txt | awk 'FNR==NR {a[$2]; next} $2 in a' Genes identifier.MasterList  > GeneList
+more txt | awk 'FNR == NR { h[$2,$2] = $0; next } h[$2,$2] {print h[$2,$2];next} {print $2,$2,"N/A","N/A"}'  GeneList Genes > identifier.SpecialFPKM_List
+
+
+###Remove unwanted files. 
+rm GeneList
+rm txt
+
+rm *transloc*
+rm BATCH*
+
+###HT-seq to get count 
+htseq-count  identifier.unpaired_uniq Danio_rerio.GRCz10.89.gtf > identifier.count
+

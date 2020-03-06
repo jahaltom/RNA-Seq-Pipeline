@@ -1,0 +1,13 @@
+samples        condition
+T1   Tumor
+T2   Tumor
+T3   Tumor
+T4   Tumor 
+T5   Tumor
+T6   Tumor
+T7   Tumor
+T8   Tumor
+T9   Tumor
+T10  Tumor
+C1   Control
+C2   Control

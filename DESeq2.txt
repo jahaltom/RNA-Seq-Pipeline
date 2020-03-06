@@ -1,0 +1,14 @@
+##Technical replicate counts summed. 
+##DE-Seq2
+library(DESeq2)
+#Read in count information. 
+countData - read.table(MasterCountTable.txt,header=TRUE,row.names=1)
+##Read in expermental design
+colData - read.table(List_DESeq2.txt,header=TRUE,row.names=1)
+##Bring everything together 
+dds - DESeqDataSetFromMatrix(countData = countData,colData = colData,design = ~ condition)
+##Calculate and write Results
+dds - DESeq(dds)
+result - results(dds, contrast=c(condition,Tumor,Control))
+result - result[complete.cases(result),]## to remove rows with NA
+write.table(result, TumorDEG.txt)

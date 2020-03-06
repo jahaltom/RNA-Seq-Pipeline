@@ -1,0 +1,7 @@
+###Chmod activated script. infile=Fastq File identifier= Sample
+Once activated type:  ./RNA-seqcompanionscript infile Sample
+
+cp  RNA-Seq  RNA-Seq.$2
+perl -i -pe 's/infile/'$1'/g'  RNA-Seq.$2
+perl -i -pe 's/identifier/'$2'/g' RNA-Seq.$2
+qsub RNA-Seq.$2
