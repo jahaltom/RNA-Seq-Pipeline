@@ -37,8 +37,8 @@ touch txt
 
 more genes.fpkm_tracking |  awk '{if(NF== 13)print $5,$4,$10; else print $5,$4,$13}' | grep -v "FPKM" | grep -v "gene"  | sort | grep -v "rRNA" > identifier.FPKM_List
 
-###If one has a specific list of gene IDs place them in "Genes". Output will be limited to specific gene list. 
-more txt | awk 'FNR==NR {a[$2]; next} $2 in a' Genes identifier.MasterList  > GeneList
+###If one has a specific list of gene IDs place them in "Genes". Output will be limited to specific gene list. In Genes file, Gene name in 1st column and GeneIDs in second. Genes IDs must be in second column of identifier.FPKM_List also.  
+more txt | awk 'FNR==NR {a[$2]; next} $2 in a' Genes identifier.FPKM_List  > GeneList
 more txt | awk 'FNR == NR { h[$2,$2] = $0; next } h[$2,$2] {print h[$2,$2];next} {print $2,$2,"N/A","N/A"}'  GeneList Genes > identifier.SpecialFPKM_List
 
 
